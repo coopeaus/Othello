@@ -76,6 +76,10 @@ class Othello:
         """Return a tuple containing the current scores"""
         return self._black_score, self._white_score
 
+    def get_board(self):
+        """Return the current game board"""
+        return self._board
+
     def print_scores(self, player_1, player_2):
         """Print the current scores"""
         print(f"Scores: \n"

@@ -2,6 +2,7 @@
 # GitHub username: amcooper181
 
 from othello_class import *
+from minimax import *
 import random
 
 
@@ -81,7 +82,7 @@ class NewGame:
                     print("Invalid move! Please try again.")
                     print(f"Available moves: {self._game.return_available_positions(player_color)}")
             except ValueError:
-                print("Invalid entry! Please enter valid integers.")
+                print("Invalid entry! Please enter a valid integer.")
 
     def display_board(self):
         """Display the board with formatting"""
@@ -110,8 +111,6 @@ class NewGame:
         """
         black, white = self._move_status()
         if black and white:
-            print(f"\nGame Over!")
-            self._game.print_scores(self._player_1, self._player_2)
             return 0
         elif black and player_color == 'black':
             return 1
@@ -183,25 +182,8 @@ class NewGame:
         if self._difficulty == 'random':
             move = random.choice(self._game.return_available_positions(player.get_color()))
         else:
-            self._game.save_state()
-            aggressive_moves = []
-            max_delta = 0
-            position_list = self._game.return_available_positions("white")
-            for position in position_list:
-                self._game.make_move('white', position)
-                black_score, white_score = self._game.get_scores()
-                score_delta = white_score - black_score
-                if score_delta > max_delta:
-                    max_delta = score_delta
-                    aggressive_moves = [position]
-                elif score_delta == max_delta:
-                    aggressive_moves.append(position)
-                elif score_delta < max_delta == 0 and len(aggressive_moves) == 0:
-                    max_delta = score_delta
-                    aggressive_moves.append(position)
-                self._game.restore_state()
-
-            move = random.choice(aggressive_moves)
+            max_play = minimax(self._game.get_board(), 5, True)
+            move = max_play[1]
 
         self._game.play_game(player.get_color(), move)
         self.display_board()
@@ -224,6 +206,8 @@ class NewGame:
         while should_continue:
             game_status = self.game_status(self._player_1.get_color())
             if game_status == 0:
+                print(f"\nGame Over!")
+                self._game.print_scores(self._player_1, self._player_2)
                 print(self._game.return_winner())
                 return
             elif game_status == 2:
@@ -231,6 +215,8 @@ class NewGame:
 
             game_status = self.game_status(self._player_2.get_color())
             if game_status == 0:
+                print(f"\nGame Over!")
+                self._game.print_scores(self._player_1, self._player_2)
                 print(self._game.return_winner())
                 return
             elif game_status == 2:
@@ -242,7 +228,6 @@ class NewGame:
             print(f"Round {round_tracker} Complete")
             round_tracker += 1
             self._game.print_scores(self._player_1, self._player_2)
-
 
 if __name__ == "__main__":
     game = NewGame()
